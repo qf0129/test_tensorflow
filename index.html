@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图像识别</title>
+    <style>
+        body{text-align: center;}
+        #img_show{min-height: 200px;min-width: 200px; height: 200px; background: #eee;}
+        #img_input{margin-top: 20px;background: #eee;padding: 5px;}
+        #text_view{margin-top: 20px;display: inline-block;  border-color:#eee; border-collapse: collapse;}
+        #text_view td{padding: 10px;}
+        #tips_view{margin-top: 20px;color: #777;background: #eee;display: inline-block;padding: 10px; text-align: left;}
+    </style>
+</head>
+
+<body>
+    <div><img id="img_show" src="" alt=""></div>
+    <div></div><input id="img_input" type="file" name="file" accept=".jpg,.jpeg,.png" /></div>
+    <div><table id="text_view" border="1"></table></div>
+    <div id="tips_view">目前可以识别以下物品：T恤/上衣、裤子、套头衫、连衣裙、外套、凉鞋、衬衫、运动鞋、包、短靴</div>
+</body>
+<script>
+    var img_input = document.querySelector("#img_input");
+    var img_show = document.querySelector("#img_show");
+    var text_view = document.querySelector("#text_view");
+
+    img_input.oninput = function () {
+        if (!img_input.value) {
+            return;
+        }
+        var file_obj = img_input.files[0];
+        if (file_obj.size > 10240000) {
+            alert("文件不能超过10MB");
+            return;
+        }
+        text_view.innerHTML = "请稍后...";
+        img_show.src = URL.createObjectURL(file_obj);
+        let url = "/upload";
+        let formdata = new FormData();
+        formdata.append("file", file_obj);
+
+        let request = new Request(url, {
+            method: 'POST',
+            credentials: 'include',
+            body: formdata,
+        });
+        fetch(request)
+            .then(response => response.json())
+            .then(result => {
+                html_str = "";
+                if (result.code == '0') {
+                    ret = result.ret;
+                    html_str = "<tr><th>预测物品</th><th>预测值</th></tr>"
+                    ret.forEach(i => {
+                        html_str += "<tr><td>" + i[0] + "</td><td>" + i[1] + "</td></tr>"
+                    });
+                } else {
+                    html_str = "检测失败";
+                    console.log(result);
+                }
+                text_view.innerHTML = html_str;
+            })
+    }
+
+</script>
+
+</html>
