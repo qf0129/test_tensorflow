@@ -22,7 +22,8 @@ def create_model():
 	model = keras.Sequential([
 	    keras.layers.Flatten(input_shape=(28, 28)),
 	    keras.layers.Dense(128, activation='relu'),
-	    keras.layers.Dense(10)
+	    keras.layers.Dense(10),
+		keras.layers.Softmax()
 	])
 
 	model.compile(optimizer='adam',
@@ -36,18 +37,18 @@ def run_with_checkpoint(model):
 	                                             verbose=1)
 
 	# model.save_weights(CHECKPOINT_PATH.format(epoch=0))
-	model.fit(train_images, train_labels, epochs=10, validation_data=(test_images,test_labels), callbacks=[cp_callback], verbose=0)
+	model.fit(train_images, train_labels, epochs=100, validation_data=(test_images,test_labels), callbacks=[cp_callback], verbose=0)
 	return model
 
 
 def run(model):
-	model.fit(train_images, train_labels, epochs=5)
+	model.fit(train_images, train_labels, epochs=100)
 
 
 def run_with_h5(model):
 
 	model.fit(train_images, train_labels, epochs=5)
-	model.save('my_model_1.h5') 
+	model.save('my_model_1.h5')
 
 
 def load_from_h5():
